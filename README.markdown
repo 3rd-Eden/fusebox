@@ -36,6 +36,7 @@ The `new` operator
 Supported sandboxed natives
 ---------------------------
       fb.Array;
+      fb.Boolean;
       fb.Date;
       fb.Function;
       fb.Number;
