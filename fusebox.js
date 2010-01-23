@@ -224,14 +224,15 @@
         return result;
       };
 
-      // make native wrappers inherit from regular natives
-      Array.prototype['__proto__']    = __Array.prototype;
-      Date.prototype['__proto__']     = __Date.prototype;
-      Function.prototype['__proto__'] = __Function.prototype;
-      Number.prototype['__proto__']   = __Number.prototype;
-      Object.prototype['__proto__']   = __Object.prototype;
-      RegExp.prototype['__proto__']   = __RegExp.prototype;
-      String.prototype['__proto__']   = __String.prototype;
+      // make prototype values conform to ECMA spec and inherit from regular natives
+      Object.prototype['__proto__']                      = __Object.prototype;
+      (Array.prototype    = [ ])['__proto__']            = __Array.prototype;
+      (Boolean.prototype  = new __Boolean)['__proto__']  = __Boolean.prototype;
+      (Date.prototype     = new __Date)['__proto__']     = __Date.prototype;
+      (Function.prototype = new __Function)['__proto__'] = __Function.prototype;
+      (Number.prototype   = new __Number)['__proto__']   = __Number.prototype;
+      (RegExp.prototype   = new __RegExp)['__proto__']   = __RegExp.prototype;
+      (String.prototype   = new __String)['__proto__']   = __String.prototype;
     }
     else {
       Array = function Array(length) {
