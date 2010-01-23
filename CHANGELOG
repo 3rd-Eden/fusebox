@@ -1,1 +1,3 @@
+* Add the overlooked reverse() and splice() methods to the sandboxed Array.prototype. [jddalton]
+
 * Add the overlooked sort() method to the sandboxed Array.prototype. [jddalton]

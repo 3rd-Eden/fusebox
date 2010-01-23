@@ -323,7 +323,9 @@
      __lastIndexOf        = arrPlugin.lastIndexOf,
      __map                = arrPlugin.map,
      __push               = arrPlugin.push,
+     __reverse            = arrPlugin.reverse,
      __slice              = arrPlugin.slice,
+     __splice             = arrPlugin.splice,
      __some               = arrPlugin.some,
      __sort               = arrPlugin.sort,
      __unshift            = arrPlugin.unshift,
@@ -496,6 +498,13 @@
     };
 
     if (!SKIP_METHODS_RETURNING_ARRAYS)
+      arrPlugin.reverse = function reverse() {
+        return this.length > 0
+          ? Array.fromArray(__reverse.call(this))
+          : Array();
+      };
+
+    if (!SKIP_METHODS_RETURNING_ARRAYS)
       arrPlugin.slice = function slice(start, end) {
         var result = __slice.call(this, start, end == null ? this.length : end);
         return result.length
@@ -510,9 +519,17 @@
 
     if (!SKIP_METHODS_RETURNING_ARRAYS)
       arrPlugin.sort = function sort(compareFn) {
-        return Array.fromArray(compareFn
-          ? __sort.call(this, compareFn)
-          : __sort.call(this));
+        return this.length > 0
+          ? Array.fromArray(compareFn ? __sort.call(this, compareFn) : __sort.call(this))
+          : Array();
+      };
+
+    if (!SKIP_METHODS_RETURNING_ARRAYS)
+      arrPlugin.splice = function splice(start, deleteCount) {
+        var result = __splice.apply(this, arguments);
+        return result.length
+          ? Array.fromArray(result)
+          : Array();
       };
 
     arrPlugin.unshift = function unshift(item) {
@@ -738,11 +755,11 @@
      getUTCMinutes = nil, getUTCMonth = nil, getUTCSeconds = nil,
      getYear = nil, join = nil, indexOf = nil, lastIndexOf = nil,
      localeCompare = nil, match = nil, map = nil, push = nil, replace = nil,
-     search = nil, slice = nil, some = nil, sort = nil, split = nil,
-     substr = nil, substring = nil, toExponential = nil, toFixed = nil,
-     toISOString = nil, toJSON = nil, toLowerCase = nil, toLocaleLowerCase = nil,
-     toLocaleUpperCase = nil, toPrecision = nil, toUpperCase = nil,
-     trim = nil, unshift = nil;
+     reverse = nil, search = nil, slice = nil, some = nil, sort = nil,
+     split = nil, splice = nil, substr = nil, substring = nil,
+     toExponential = nil, toFixed = nil, toISOString = nil, toJSON = nil,
+     toLowerCase = nil, toLocaleLowerCase = nil, toLocaleUpperCase = nil,
+     toPrecision = nil, toUpperCase = nil, trim = nil, unshift = nil;
 
     // assign native wrappers to Fusebox instance and return
     instance.Array    = Array;
