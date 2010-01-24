@@ -26,14 +26,7 @@ sandboxed natives and a full Fusebox code review.
   3. [How to create a Fusebox: Screencast Three](http://allyoucanleet.com/2010/01/18/sandboxed-natives-three/)
   4. [The Final Countdown: Screencast Four](http://allyoucanleet.com/2010/01/21/sandboxed-natives-four/)
 
-The `new` operator
-------------------
-      // with `new` operator
-      var fb = new Fusebox();
-      // or without
-      fb = Fusebox();
-
-Supported sandboxed natives
+Supported Fuseboxed natives
 ---------------------------
       fb.Array;
       fb.Boolean;
@@ -44,20 +37,27 @@ Supported sandboxed natives
       fb.RegExp;
       fb.String;
 
+The `new` operator
+------------------
+      // with `new` operator
+      var fb = new Fusebox();
+      // or without
+      fb = Fusebox();
+
 Chainable
 ---------
-      // returns ["a", "b", "c"] <- array & string values are sandboxed
+      // returns ["a", "b", "c"] <- array & string values are Fuseboxed
       fb.String("c b a").split(" ").sort();
 
 Working with arrays<sup><a name="fnref2" href="#fn2">2</a></sup>
 -------------------
-      // like the native Array constructor the sandboxed constructor will return [ , , ]
+      // like the native Array constructor the Fuseboxed constructor will return [ , , ]
       var a = fb.Array(3);
       
       // equiv to square-bracket notation [3]
       var b = fb.Array.create(3);
       
-      // converting a native array to a sandboxed array
+      // converting a native array to a Fuseboxed array
       var c = fb.Array.fromArray([1, 2, 3]);
 
 Working with object instances
@@ -89,7 +89,7 @@ Working with object instances
       fb.String("Oh hai") != fb.String("Oh hai");
       fb.String("Oh hai") !== fb.String("Oh hai");
 
-Converting sandboxed natives to document natives
+Converting Fuseboxed natives to document natives
 ------------------------------------------------
       var a = fb.String("Oh hai");
       var b = fb.Number(1);
@@ -128,14 +128,12 @@ The `plugin` alias of `prototype`
 
 Gotchas
 -------
-  - Sandboxed natives don't affect the document natives but
-    in some cases document natives may affect sandboxed
-    natives. The `__proto__` technique used by Gecko\WebKit
-    is affected by modifications to the document natives. To
-    avoid this issue simply create the Fusebox before modifying
-    the document natives.
+  - The `__proto__` technique, used by Gecko\WebKit\KHTML, may be affected
+    by modifications to the document native constructor's prototype. To
+    avoid this issue simply create the Fusebox before modifying the
+    document native constructor's prototype.
     
-          // problem
+          // problem in Gecko\WebKit\KHTML
           Array.prototype.sort = function() { return "Oh noes!" };
           var fb = Fusebox();
           fb.Array(3, 2, 1).sort(); // ["O", "h", " ", "n", "o", "e", "s", "!"]
@@ -145,9 +143,9 @@ Gotchas
           Array.prototype.sort = function() { return "Oh noes!" };
           fb.Array(3, 2, 1).sort(); // [1, 2, 3]
 
-  - Sandboxed natives created by the ActiveX / iframe techniques will
+  - Fuseboxed natives created by the ActiveX / iframe techniques will
     inherit<sup><a name="fnref3" href="#fn3">3</a></sup>
-    from the sandboxed Object object's prototype.
+    from the Fuseboxed Object object's prototype.
     
           fb.Object.prototype.nom = function() {
             return fb.String(this + " nom nom nom!");
@@ -155,16 +153,37 @@ Gotchas
           
           fb.String("Cheezburger").nom(); // "Cheezburger nom nom nom!"
 
+  - Fuseboxed native instances created by the `__proto__` technique will 
+    return `true` for `instanceof` operations against document native constructors.
+    The `instanceof` operator should be avoided for object type
+    detection<sup><a name="fnref4" href="#fn4">4</a></sup>.
+    
+          // returns true Fuseboxed native constructors...
+          fb.Number(1) instanceof fb.Number; // true
+          fb.Array(1, 2, 3) instanceof fb.Array; // true
+          fb.String("Oh hai") instanceof fb.String; // true
+          
+          // but also document native constructors in Gecko\WebKit\KHTML
+          fb.Number(1) instanceof Number; // true
+          fb.Array(1, 2, 3) instanceof Array; // true
+          fb.String("Oh hai") instanceof String; // true
+
 Footnotes
 ---------
-  1. The standalone version lacks support for fixing cross-browser `\s`
-     RegExp character class inconsistencies and native generics like
-     `fb.Array.slice(array, 0)`.
+  1. FuseJS supports native generics like`fb.Array.slice(array, 0)` and
+     fixes cross-browser `\s` RegExp character class inconsistencies.
      <a name="fn1" title="Jump back to footnote 1 in the text." href="#fnref1">&#8617;</a>
 
   2. FuseJS supports additional Array helpers like `fuse.Array.from()` and `fuse.Array.fromNodeList()`.
      <a name="fn2" title="Jump back to footnote 2 in the text." href="#fnref2">&#8617;</a>
 
   3. The Object object inheritance inconsistency is resolved in FuseJS by assigning `fuse.Object` an object Object
-     of a different sandbox instance effectively removing Object object inheritance for the other natives on the `fuse` namespace.
+     of a different Fusebox instance effectively removing Object object inheritance for the other natives on the `fuse` namespace.
      <a name="fn3" title="Jump back to footnote 3 in the text." href="#fnref3">&#8617;</a>
+
+  4. For more information on why `instanceof` should be avoided please read
+     "[instanceof considered harmful](http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/)"
+     by Juriy Zaystev and 
+     "[Working around the instanceof memory leak](http://ajaxian.com/archives/working-aroung-the-instanceof-memory-leak)"
+     by Gino Cochuyt.
+     <a name="fn4" title="Jump back to footnote 4 in the text." href="#fnref4">&#8617;</a>
