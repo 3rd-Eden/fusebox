@@ -183,7 +183,7 @@ Footnotes
 
   4. For more information on why `instanceof` should be avoided please read
      "[instanceof considered harmful](http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/)"
-     by Juriy Zaystev and 
+     by Juriy Zaytsev and 
      "[Working around the instanceof memory leak](http://ajaxian.com/archives/working-aroung-the-instanceof-memory-leak)"
      by Gino Cochuyt.
      <a name="fn4" title="Jump back to footnote 4 in the text." href="#fnref4">&#8617;</a>
