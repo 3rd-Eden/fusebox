@@ -132,12 +132,13 @@
     };
   })(),
 
-  createFusebox = function() {
+  createFusebox = function(instance) {
+    // Most methods try to follow ECMA spec but may differ from
+    // the documented method.length value or allow null callbacks.
     var Array, Boolean, Date, Function, Number, Object, RegExp, String,
      glSlice     = global.Array.prototype.slice,
      glFunction  = global.Function,
-     instance    = new Klass,
-     matchStrict = /^\s*(['"])use strict\1/,
+     reStrict    = /^\s*(['"])use strict\1/,
      sandbox     = createSandbox(),
      toString    = global.Object.prototype.toString,
      __Array     = sandbox.Array,
@@ -148,6 +149,8 @@
      __Object    = sandbox.Object,
      __RegExp    = sandbox.RegExp,
      __String    = sandbox.String;
+
+    instance || (instance = new Klass);
 
     if (mode === OBJECT__PROTO__) {
       Array = function Array(length) {
@@ -176,7 +179,7 @@
            : new __Date(year, month, date || 1, hours || 0, minutes || 0, seconds || 0, ms || 0);
          result['__proto__'] = datePlugin;
         }
-        else result = String(new __Date);
+        else result = instance.String(new __Date);
         return result;
       };
 
@@ -198,12 +201,12 @@
       Object = function Object(value) {
         if (value != null) {
          switch (toString.call(value)) {
-           case '[object Boolean]': return Boolean(value);
-           case '[object Number]':  return Number(value);
-           case '[object String]':  return String(value);
+           case '[object Boolean]': return instance.Boolean(value);
+           case '[object Number]':  return instance.Number(value);
+           case '[object String]':  return instance.String(value);
            case '[object Array]':
-             if (value.constructor !== Array)
-               return Array.fromArray(value);
+             if (value.constructor !== instance.Array)
+               return instance.Array.fromArray(value);
          }
          return value;
         }
@@ -255,7 +258,7 @@
            ? new __Date(year)
            : new __Date(year, month, date || 1, hours || 0, minutes || 0, seconds || 0, ms || 0);
         }
-        return String(new __Date);
+        return instance.String(new __Date);
       };
 
       Function = function Function(argN, body) {
@@ -264,7 +267,7 @@
         argN = args.join(',');
 
         // ensure we aren't in strict mode and map arguments.callee to the wrapper
-        if (body && body.search(matchStrict) < 0)
+        if (body && body.search(reStrict) < 0)
           body = 'arguments.callee = arguments.callee.' + expando + '; ' + body;
 
         // create function using global.Function constructor
@@ -288,12 +291,12 @@
       Object = function Object(value) {
         if (value != null) {
          switch (toString.call(value)) {
-           case '[object Boolean]': return Boolean(value);
-           case '[object Number]':  return Number(value);
-           case '[object String]':  return String(value);
+           case '[object Boolean]': return instance.Boolean(value);
+           case '[object Number]':  return instance.Number(value);
+           case '[object String]':  return instance.String(value);
            case '[object Array]':
-             if (value.constructor !== Array)
-               return Array.fromArray(value);
+             if (value.constructor !== instance.Array)
+               return instance.Array.fromArray(value);
          }
          return value;
         }
@@ -432,20 +435,20 @@
 
     // ECMA-5 15.9.4.4
     Date.now = (function() {
-      var now = function now() { return Number(+new Date()); };
+      var now = function now() { return instance.Number(+new Date()); };
       if (__Date.now)
-        now = function now() { return Number(__Date.now()); };
+        now = function now() { return instance.Number(__Date.now()); };
       return now;
     })();
 
     // ECMA-5 15.9.4.2
     Date.parse = function parse(dateString) {
-      return Number(__Date.parse(dateString));
+      return instance.Number(__Date.parse(dateString));
     };
 
     // ECMA-5 15.9.4.3
     Date.UTC = function UTC(year, month, date, hours, minutes, seconds, ms) {
-      return Number(__Date.UTC(year, month, date || 1, hours || 0, minutes || 0, seconds || 0, ms || 0));
+      return instance.Number(__Date.UTC(year, month, date || 1, hours || 0, minutes || 0, seconds || 0, ms || 0));
     };
 
     // ECMA-5 15.5.3.2
@@ -486,13 +489,13 @@
 
     if (arrPlugin.indexOf)
       arrPlugin.indexOf = function indexOf(item, fromIndex) {
-        return Number(__indexOf.call(this, item,
+        return instance.Number(__indexOf.call(this, item,
           fromIndex == null ? 0 : fromIndex));
       };
 
     if (arrPlugin.lastIndexOf)
       arrPlugin.lastIndexOf = function lastIndexOf(item, fromIndex) {
-        return Number(__lastIndexOf.call(this, item,
+        return instance.Number(__lastIndexOf.call(this, item,
           fromIndex == null ? this.length : fromIndex));
       };
 
@@ -506,7 +509,7 @@
 
     arrPlugin.push = function push(item) {
       var args = arguments;
-      return Number(args.length > 1
+      return instance.Number(args.length > 1
         ? __push.apply(this, args)
         : __push.call(this, item));
     };
@@ -548,113 +551,113 @@
 
     arrPlugin.unshift = function unshift(item) {
       var args = arguments;
-      return Number(args.length > 1
+      return instance.Number(args.length > 1
         ? __unshift.apply(this, args)
         : __unshift.call(this, item));
     };
 
     datePlugin.getDate = function getDate() {
-      return Number(__getDate.call(this));
+      return instance.Number(__getDate.call(this));
     };
 
     datePlugin.getDay = function getDay() {
-      return Number(__getDay.call(this));
+      return instance.Number(__getDay.call(this));
     };
 
     datePlugin.getFullYear = function getFullYear() {
-      return Number(__getFullYear.call(this));
+      return instance.Number(__getFullYear.call(this));
     };
 
     datePlugin.getHours = function getHours() {
-      return Number(__getHours.call(this));
+      return instance.Number(__getHours.call(this));
     };
 
     datePlugin.getMilliseconds = function getMilliseconds() {
-      return Number(__getMilliseconds.call(this));
+      return instance.Number(__getMilliseconds.call(this));
     };
 
     datePlugin.getMinutes = function getMinutes() {
-      return Number(__getMinutes.call(this));
+      return instance.Number(__getMinutes.call(this));
     };
 
     datePlugin.getMonth  = function getMonth () {
-      return Number(__getMonth.call(this));
+      return instance.Number(__getMonth.call(this));
     };
 
     datePlugin.getSeconds = function getSeconds() {
-      return Number(__getSeconds.call(this));
+      return instance.Number(__getSeconds.call(this));
     };
 
     datePlugin.getTime = function getTime() {
-      return Number(__getTime.call(this));
+      return instance.Number(__getTime.call(this));
     };
 
     datePlugin.getTimezoneOffset = function getTimezoneOffset() {
-      return Number(__getTimezoneOffset.call(this));
+      return instance.Number(__getTimezoneOffset.call(this));
     };
 
     datePlugin.getUTCDate = function getUTCDate() {
-      return Number(__getUTCDate.call(this));
+      return instance.Number(__getUTCDate.call(this));
     };
 
     datePlugin.getUTCDay = function getUTCDay() {
-      return Number(__getUTCDay.call(this));
+      return instance.Number(__getUTCDay.call(this));
     };
 
     datePlugin.getUTCFullYear = function getUTCFullYear() {
-      return Number(__getUTCFullYear.call(this));
+      return instance.Number(__getUTCFullYear.call(this));
     };
 
     datePlugin.getUTCHours = function getUTCHours() {
-      return Number(__getUTCHours.call(this));
+      return instance.Number(__getUTCHours.call(this));
     };
 
     datePlugin.getUTCMilliseconds = function getUTCMilliseconds() {
-      return Number(__getUTCMilliseconds.call(this));
+      return instance.Number(__getUTCMilliseconds.call(this));
     };
 
     datePlugin.getUTCMinutes = function getUTCMinutes() {
-      return Number(__getUTCMinutes.call(this));
+      return instance.Number(__getUTCMinutes.call(this));
     };
 
     datePlugin.getUTCMonth = function getUTCMonth() {
-      return Number(__getUTCMonth.call(this));
+      return instance.Number(__getUTCMonth.call(this));
     };
 
     datePlugin.getUTCSeconds = function getUTCSeconds() {
-      return Number(__getUTCSeconds.call(this));
+      return instance.Number(__getUTCSeconds.call(this));
     };
 
     datePlugin.getYear = function getYear() {
-      return Number(__getYear.call(this));
+      return instance.Number(__getYear.call(this));
     };
 
     if (datePlugin.toISOString)
       datePlugin.toISOString = function toISOString() {
-        return String(__toISOString.call(this));
+        return instance.String(__toISOString.call(this));
       };
 
     if (datePlugin.toJSON)
       datePlugin.toJSON= function toJSON() {
-        return String(__toJSON.call(this));
+        return instance.String(__toJSON.call(this));
       };
 
     numPlugin.toExponential = function toExponential() {
-      return Number(__toExponential.call(this));
+      return instance.Number(__toExponential.call(this));
     };
 
     numPlugin.toFixed = function toFixed() {
-      return Number(__toFixed.call(this));
+      return instance.Number(__toFixed.call(this));
     };
 
     numPlugin.toPrecision = function toPrecision() {
-      return Number(__toPrecision.call(this));
+      return instance.Number(__toPrecision.call(this));
     };
 
     rePlugin.exec = function exec(string) {
       var length, results, output = __exec.call(this, string);
       if (output) {
-        length = output.length; results = Array();
+        length = output.length; results = instance.Array();
         while (length--) results[length] = String(output[length]);
       }
       return output && results;
@@ -665,7 +668,7 @@
     };
 
     strPlugin.charCodeAt = function charCodeAt(pos) {
-      return Number(__charCodeAt.call(this, pos));
+      return instance.Number(__charCodeAt.call(this, pos));
     };
 
     strPlugin.concat = function concat(item) {
@@ -676,23 +679,23 @@
     };
 
     strPlugin.indexOf = function indexOf(item, fromIndex) {
-      return Number(__strIndexOf.call(this, item,
+      return instance.Number(__strIndexOf.call(this, item,
         fromIndex == null ? 0 : fromIndex));
     };
 
     strPlugin.lastIndexOf = function lastIndexOf(item, fromIndex) {
-      return Number(__strLastIndexOf.call(this, item,
+      return instance.Number(__strLastIndexOf.call(this, item,
         fromIndex == null ? this.length : fromIndex));
     };
 
     strPlugin.localeCompare = function localeCompare(that) {
-      return Number(__localeCompate.call(this, that));
+      return instance.Number(__localeCompate.call(this, that));
     };
 
     strPlugin.match = function match(pattern) {
       var length, results, output = __match.call(this, pattern);
       if (output) {
-        length = output.length; results = Array();
+        length = output.length; results = instance.Array();
         while (length--) results[length] = String(output[length]);
       }
       return output && results;
@@ -703,7 +706,7 @@
     };
 
     strPlugin.search = function search(pattern) {
-      return Number(__search.call(pattern));
+      return instance.Number(__search.call(pattern));
     };
 
     strPlugin.slice = function slice(start, end) {
@@ -789,25 +792,29 @@
     return instance;
   },
 
-  postProcess = function(thisArg) {
-    // remove iframe
-    var iframe = cache[cache.length -1];
-    iframe.parentNode.removeChild(iframe);
-    return thisArg;
-  },
+  postProcess = function() { },
 
   Klass = function() { },
 
-  Fusebox = function Fusebox() { return createFusebox(); };
+  Fusebox = function Fusebox(instance) { return createFusebox(instance); };
 
   /*------------------------------------------------------------------------*/
 
   // set to vanilla object so sandboxes will have something to attach to
   global.Fusebox = { };
 
+  // redefine Fusebox to remove the iframe from the document
   if (mode === IFRAME) {
-    // redefine Fusebox to remove the iframe from the document
-    Fusebox = function Fusebox() { return postProcess(createFusebox()); };
+    Fusebox = function Fusebox(instance) {
+      return postProcess(createFusebox(instance));
+    };
+
+    postProcess = function(instance) {
+      // remove iframe
+      var iframe = cache[cache.length -1];
+      iframe.parentNode.removeChild(iframe);
+      return instance;
+    };
   }
 
   if (mode != OBJECT__PROTO__) {
@@ -838,10 +845,10 @@
           try { Array().map(K); }
           catch (e) {
             postProcess = (function(__postProcess) {
-              return function(thisArg) {
-                thisArg.Array.prototype.map =
-                thisArg.String.prototype.lastIndexOf = nil;
-                return __postProcess(thisArg);
+              return function(instance) {
+                instance.Array.prototype.map =
+                instance.String.prototype.lastIndexOf = nil;
+                return __postProcess(instance);
               };
             })(postProcess);
           }

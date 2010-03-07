@@ -44,6 +44,11 @@ The `new` operator
       // or without
       fb = Fusebox();
 
+Attach to a custom object
+-------------------
+      Fusebox(MyApp);
+      var a = MyApp.Array(1, 2, 3);
+
 Chainable
 ---------
       // returns ["a", "b", "c"] <- array & string values are Fuseboxed

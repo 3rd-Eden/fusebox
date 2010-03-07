@@ -1,3 +1,5 @@
+* Add `instance` argument to fuse.Fusebox() allowing a custom object to be used as the base which sandboxed natives are attached to. [jddalton]
+
 * Make the constructor's prototype values of the OBJECT__PROTO__ branch conform to ECMA specifications. [jddalton]
 
 * Add sandboxed Boolean constructor. [jddalton]
