@@ -1,3 +1,5 @@
+* Fix fuse.Fusebox'ed String#match and RegExp#exec to allow returning arrays containing undefined values. [jddalton]
+
 * Fix fuse.Fusebox wrappers for Number methods toExponential(), toFixed(), and toPrecision(). [jddalton]
 
 * Ensure fuse.Fusebox Native methods that return arrays set index values in accending order so de facto order is preserved in for-in loops. [jddalton]
