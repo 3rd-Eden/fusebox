@@ -135,7 +135,7 @@
   createFusebox = function(instance) {
     // Most methods try to follow ECMA spec but may differ from
     // the documented method.length value or allow null callbacks.
-    var Array, Boolean, Date, Function, Number, Object, RegExp, String,
+    var Array, Boolean, Date, Function, Number, Object, RegExp, String, from,
      glSlice     = global.Array.prototype.slice,
      glFunction  = global.Function,
      reStrict    = /^\s*(['"])use strict\1/,
@@ -151,6 +151,30 @@
      __String    = sandbox.String;
 
     instance || (instance = new Klass);
+
+    from = function(value) {
+      switch (toString.call(value)) {
+        case '[object Array]':
+          if (value.constructor !== instance.Array) {
+            return instance.Array.fromArray(value);
+          }
+          break;
+
+        case '[object RegExp]':
+         if (value.constructor !== instance.RegExp) {
+           return instance.RegExp(value.source,
+             (value.global     ? 'g' : '') +
+             (value.ignoreCase ? 'i' : '') +
+             (value.multiline  ? 'm' : ''));
+         }
+         break;
+
+        case '[object Boolean]': return instance.Boolean(value);
+        case '[object Number]':  return instance.Number(value);
+        case '[object String]':  return instance.String(value);
+      }
+      return value;
+    };
 
     if (mode === OBJECT__PROTO__) {
       Array = function Array(length) {
@@ -200,15 +224,7 @@
 
       Object = function Object(value) {
         if (value != null) {
-         switch (toString.call(value)) {
-           case '[object Boolean]': return instance.Boolean(value);
-           case '[object Number]':  return instance.Number(value);
-           case '[object String]':  return instance.String(value);
-           case '[object Array]':
-             if (value.constructor !== instance.Array)
-               return instance.Array.fromArray(value);
-         }
-         return value;
+          return from(value);
         }
         var result = new __Object;
         result['__proto__'] = objPlugin;
@@ -289,18 +305,9 @@
       };
 
       Object = function Object(value) {
-        if (value != null) {
-         switch (toString.call(value)) {
-           case '[object Boolean]': return instance.Boolean(value);
-           case '[object Number]':  return instance.Number(value);
-           case '[object String]':  return instance.String(value);
-           case '[object Array]':
-             if (value.constructor !== instance.Array)
-               return instance.Array.fromArray(value);
-         }
-         return value;
-        }
-        return new __Object;
+        return value != null
+          ? from(value)
+          : new __Object;
       };
 
       RegExp = function RegExp(pattern, flags) {
