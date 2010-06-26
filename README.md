@@ -58,10 +58,7 @@ Working with arrays<sup><a name="fnref2" href="#fn2">2</a></sup>
 -------------------
       // like the native Array constructor the Fuseboxed constructor will return [ , , ]
       var a = fb.Array(3);
-      
-      // equiv to square-bracket notation [3]
-      var b = fb.Array.create(3);
-      
+
       // converting a native array to a Fuseboxed array
       var c = fb.Array.fromArray([1, 2, 3]);
 

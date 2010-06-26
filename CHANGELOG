@@ -1,3 +1,11 @@
+* Fix memory leak associated with ActiveX technique. [jddalton, Sebastian Werner]
+
+* Add Fusebox.getMode() and Fusebox.setMode() methods. [jddalton]
+
+* Fix Firefox bug when adding and then removing iframes before dom load. [getify, jddalton]
+
+* Rewrite Fusebox to use iframes by default. [jddalton]
+
 * Fix fuse.Fusebox'ed Array#map when the SKIP_METHODS_RETURNING_ARRAYS true. [jddalton]
 
 * Ensure Fuse.Fusebox'ed String#search passes the correct arguments to its internal method. [jddalton]
