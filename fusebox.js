@@ -63,7 +63,8 @@
   })(),
 
   Fusebox = function Fusebox(instance) {
-    return postProcess(createFusebox(instance));
+    instance = createFusebox(instance);
+    return postProcess(instance);
   },
 
   Klass = function() { },
@@ -71,8 +72,6 @@
   postProcess = IDENTITY,
 
   postProcessIframe = function(instance) {
-    var div, errored, toString = instance.Object().toString;
-
     postProcess =
     postProcessIframe = function(instance) {
       var iframe = cache[cache.length - 1];
@@ -88,27 +87,29 @@
     // Opera 9.5 - 9.64 will error by simply calling the methods.
     // Opera 10 will error when first accessing the contentDocument of
     // another iframe and then accessing the methods.
-    if (toString.call(instance.Array().map) === '[object Function]') {
-      // trash can
-      div = doc.createElement('div');
-
-      // create and remove second iframe
-      postProcessIframe(createSandbox());
-
-      // test to see if Array#map is corrupted
-      try {
-        instance.Array().map(NOOP);
-      } catch (e) {
-        // remove second iframe
+    return (function() {
+      var div, errored, toString = instance.Object().toString;
+      if (toString.call(instance.Array().map) === '[object Function]') {
+        // trash can
+        div = doc.createElement('div');
+  
+        // create and remove second iframe
+        postProcessIframe(createSandbox());
+  
+        // test to see if Array#map is corrupted
+        try {
+          instance.Array().map(NOOP);
+        } catch (e) {
+          // remove second iframe
+          div.appendChild(cache.pop());
+          IS_MAP_CORRUPT = errored = true;
+        }
+        // remove first iframe
         div.appendChild(cache.pop());
-        IS_MAP_CORRUPT = errored = true;
+        div.innerHTML = '';
       }
-      // remove first iframe
-      div.appendChild(cache.pop());
-      div.innerHTML = '';
-    }
-    div = null;
-    return errored ? Fusebox(instance) : instance;
+      return errored ? Fusebox(instance) : instance;
+    })();
   },
 
   getMode = function() {
@@ -972,8 +973,8 @@
   // fix document.readyState for Firefox < 3.6
   if (typeof doc.readyState !== 'string' && isHostType(doc, 'addEventListener')) {
     doc.readyState = 'loading';
-    doc.addEventListener('DOMContentLoaded', function() { doc.readyState = 'interactive'; }, false);
-    global.addEventListener('load', function() { doc.readyState = 'complete'; }, false);
+    doc.addEventListener('DOMContentLoaded', function() { doc.readyState = 'interactive'; }, true);
+    global.addEventListener('load', function() { doc.readyState = 'complete'; }, true);
   }
 
   // map Fusebox.prototype to Klass so Fusebox can be called without the `new` expression
