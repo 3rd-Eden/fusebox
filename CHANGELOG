@@ -1,3 +1,5 @@
+* Correct sandbox mode detection for Safari to avoid iframes. [jddalton, Kit Goncharov]
+
 * Fix reference to postProcess() when it's redefined. [jddalton]
 
 * Fix memory leak associated with ActiveX technique. [jddalton, Sebastian Werner]
