@@ -1,3 +1,7 @@
+* Ensure `reStrict` detects the strict mode directive correctly. [jddalton, kangax, Kit Goncharov]
+
+* Add supplemental checks for the Firefox iframe issue with sandboxed natives. [jddalton]
+
 * Correct sandbox mode detection for Safari to avoid iframes. [jddalton, Kit Goncharov]
 
 * Fix reference to postProcess() when it's redefined. [jddalton]

@@ -16,7 +16,7 @@
 
   doc = global.document,
 
-  expando = 'uid' + (new Date).getTime(),
+  uid = 'uid' + (new Date).getTime(),
 
   // Host objects have a range of typeof values such as
   // typeof document.createElement('div').offsetParent -> unknown
@@ -81,18 +81,22 @@
 
     postProcessIframe(instance);
 
-    // Opera 9.5 - 10a throws a security error when calling Array#map or
-    // String#lastIndexOf on sandboxed natives created on the file:// protocol.
-    // 
-    // Opera 9.5 - 9.64 will error by simply calling the methods.
-    // Opera 10 will error when first accessing the contentDocument of
-    // another iframe and then accessing the methods.
     return (function() {
-      var div, errored, toString = instance.Object().toString;
-      if (toString.call(instance.Array().map) === '[object Function]') {
-        // trash can
-        div = doc.createElement('div');
-  
+      var errored, div = doc.createElement('div'),
+       toString = instance.Object().toString;
+
+      // Safari does not support sandboxed natives from iframes :(
+      if (instance.Array().constructor === Array) {
+        // move first iframe to trash
+        errored = !!div.appendChild(cache.pop());
+      }
+      // Opera 9.5 - 10a throws a security error when calling Array#map or
+      // String#lastIndexOf on sandboxed natives created on the file:// protocol.
+      // 
+      // Opera 9.5 - 9.64 will error by simply calling the methods.
+      // Opera 10 will error when first accessing the contentDocument of
+      // another iframe and then accessing the methods.
+      else if (toString.call(instance.Array().map) === '[object Function]') {
         // create and remove second iframe
         postProcessIframe(createSandbox());
   
@@ -100,14 +104,14 @@
         try {
           instance.Array().map(NOOP);
         } catch (e) {
-          // remove second iframe
-          div.appendChild(cache.pop());
-          IS_MAP_CORRUPT = errored = true;
+          // move iframe to trash
+          IS_MAP_CORRUPT = errored = !!div.appendChild(cache.pop());
         }
-        // remove first iframe
+        // move other iframe to trash
         div.appendChild(cache.pop());
-        div.innerHTML = '';
       }
+
+      div.innerHTML = '';
       return errored ? Fusebox(instance) : instance;
     })();
   },
@@ -122,7 +126,7 @@
   },
 
   createSandbox = function() {
-    var xdoc, iframe, name, parentNode, result;
+    var iframe, key, name, parentNode, result, xdoc;
 
     switch (MODE) {
       case PROTO_MODE: return global;
@@ -146,7 +150,8 @@
         return xdoc.parentWindow;
 
       case IFRAME_MODE:
-        name = expando + counter++;
+        key = '/* fusebox_iframe_cache_fix */';
+        name = uid + counter++;
         parentNode = doc.body || doc.documentElement;
 
         try {
@@ -155,13 +160,24 @@
         } catch(e) {
           (iframe = doc.createElement('iframe')).name = name;
         }
-        iframe.style.display = 'none';
-        parentNode.insertBefore(iframe, parentNode.firstChild);
 
-        // IE / Opera 9.25 throw security errors when trying to write to an iframe
-        // after the document.domain is set. Also Opera < 9 doesn't support
-        // inserting an iframe into the document.documentElement.
         try {
+          // Detect caching bug in Firefox 3.5+
+          // A side effect is that Firefox will use the __proto__ technique
+          // when served from the file:// protocol as well
+          if ('MozOpacity' in doc.documentElement.style &&
+              isHostType(global, 'sessionStorage') &&
+              !global.sessionStorage[key]) {
+            global.sessionStorage[key] = 1;
+            throw new Error;
+          }
+
+          // IE / Opera 9.25 throw security errors when trying to write to an iframe
+          // after the document.domain is set. Also Opera < 9 doesn't support
+          // inserting an iframe into the document.documentElement.
+          iframe.style.display = 'none';
+          parentNode.insertBefore(iframe, parentNode.firstChild);
+
           result = global.frames[name];
           (xdoc = result.document).open();
           xdoc.write(
@@ -172,18 +188,11 @@
             // the iframe will persist its `src` property so we check if our
             // iframe has a src property and load it if found.
             '<script>var g=this,c=function(s){' +
-            'if(g.parent.document.readyState!="complete"){' +
             '(s=g.frameElement.src)&&g.location.replace(s);' +
-            'g.setTimeout(c,10)}};' +
+            'if(g.parent.document.readyState!="complete"){g.setTimeout(c,10)}};' +
             'c()<\/script>');
 
           xdoc.close();
-
-          // Safari does not support sandboxed natives from iframes :(
-          if (result.Array().constructor === Array) {
-            parentNode.removeChild(iframe);
-            throw new TypeError;
-          }
           cache.push(iframe);
           return result;
         }
@@ -208,7 +217,7 @@
     var Array, Boolean, Date, Function, Number, Object, RegExp, String, from, isFunction,
      filterCallback       = function(value) { return value != null; },
      glFunction           = global.Function,
-     reStrict             = /^\s*(['"])use strict\1/,
+     reStrict             = /^(?:\/\*+[\w|\W]*?\*\/|\/\/.*?[\n\r\u2028\u2029]|\s)*(["'])use strict\1/,
      sandbox              = createSandbox(),
      isProtoMode          = MODE === PROTO_MODE,
      isArrayChainable     = !isProtoMode && !(sandbox.Array().slice(0) instanceof global.Array),
@@ -437,15 +446,15 @@
          originalBody = body = args.pop();
 
         // ensure we aren't in strict mode and map arguments.callee to the wrapper
-        if (body && body.search(reStrict) < 0) {
-          body = 'arguments.callee=arguments.callee.' + expando + ';' + body;
+        if (body && !reStrict.test(body)) {
+          body = 'arguments.callee=arguments.callee.' + uid + ';' + body;
         }
 
         // create function using global.Function constructor
         fn = new glFunction(args.join(','), body);
 
         // ensure `thisArg` isn't set to the sandboxed global
-        result = fn[expando] = new __Function('global, fn',
+        result = fn[uid] = new __Function('global, fn',
           'var sandbox=this;' +
           'return function(){' +
           'return fn.apply(this==sandbox?global:this,arguments)' +
