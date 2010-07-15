@@ -326,12 +326,6 @@
           }
           break;
 
-        case '[object Date]':
-          if (value.constructor !== instance.Date) {
-            return instance.Date(+value);
-          }
-          break;
-
         case '[object RegExp]':
           if (value.constructor !== instance.RegExp) {
             return instance.RegExp(value.source,
@@ -341,6 +335,7 @@
           }
           break;
 
+        case '[object Date]'   :
         case '[object Number]' :
         case '[object String]' :
           classOf = classOf.slice(8,-1);
