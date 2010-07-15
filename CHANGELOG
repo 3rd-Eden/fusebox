@@ -1,3 +1,5 @@
+* Allow Array constructor to throw errors if its passed an invalid length. [jddalton, kangax]
+
 * Remove method wrapping for Array#sort in the __proto__ fork. [jddalton]
 
 * Ensure `reStrict` detects the strict mode directive correctly. [jddalton, kangax, Kit Goncharov]

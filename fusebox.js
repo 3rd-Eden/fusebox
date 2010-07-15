@@ -352,7 +352,7 @@
       Array = function Array(length) {
         var result = [], argLen = arguments.length;
         if (argLen) {
-          if (argLen === 1 && length === length >>> 0) {
+          if (argLen === 1 && typeof length === 'number') {
             result.length = length;
           } else {
             result.push.apply(result, arguments);
@@ -420,7 +420,7 @@
       Array = function Array(length) {
         var argLen = arguments.length;
         if (argLen) {
-          return argLen === 1 && length === length >>> 0
+          return argLen === 1 && typeof length === 'number'
             ? new __Array(length)
             : Array.fromArray(arguments);
         }
