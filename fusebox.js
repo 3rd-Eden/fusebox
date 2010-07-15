@@ -658,12 +658,6 @@
           : Array();
       };
 
-      arrPlugin.sort = function sort(compareFn) {
-        return this.length > 0
-          ? Array.fromArray(compareFn ? __sort.call(this, compareFn) : __sort.call(this))
-          : Array();
-      };
-
       arrPlugin.splice = function splice(start, deleteCount) {
         var result = __splice.apply(this, arguments);
         return result.length
@@ -878,7 +872,6 @@
     arrPlugin.concat.raw  = __concat;
     arrPlugin.reverse.raw = __reverse;
     arrPlugin.slice.raw   = __slice;
-    arrPlugin.sort.raw    = __sort;
     arrPlugin.splice.raw  = __splice;
 
 
