@@ -963,7 +963,7 @@
   }
 
   // fix document.readyState for Firefox < 3.6
-  if (typeof doc.readyState !== 'string' && isHostType(doc, 'addEventListener')) {
+  if (doc && typeof doc.readyState !== 'string' && isHostType(doc, 'addEventListener')) {
     doc.readyState = 'loading';
     doc.addEventListener('DOMContentLoaded', function() { doc.readyState = 'interactive'; }, true);
     global.addEventListener('load', function() { doc.readyState = 'complete'; }, true);

@@ -1,3 +1,5 @@
+* Ensure the document object exists before trying to access properties off of it. [jddalton]
+
 * Simplify the private object from() function. [jddalton]
 
 * Reduce the prototype chain method lookup by one for the __proto__ fork. [jddalton]
