@@ -1,3 +1,5 @@
+* Reduce the prototype chain method lookup by one for the __proto__ fork. [jddalton]
+
 * Allow Array constructor to throw errors if its passed an invalid length. [jddalton, kangax]
 
 * Remove method wrapping for Array#sort in the __proto__ fork. [jddalton]
