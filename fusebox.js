@@ -456,9 +456,9 @@
 
         // ensure `thisArg` isn't set to the sandboxed global
         result = fn[uid] = new __Function('global, fn',
-          'var sandbox=this;' +
+          'var sb=this;' +
           'return function(){' +
-          'return fn.apply(this==sandbox?global:this,arguments)' +
+          'return fn.apply(this==sb?global:this,arguments)' +
           '}')(global, fn);
 
         // make toString() return the unmodified function body
@@ -896,16 +896,6 @@
     numPlugin.constructor  = Number;
     regPlugin.constructor  = RegExp;
     strPlugin.constructor  = String;
-
-    // add [[Class]] property to eaches prototype as a fallback in case
-    // toString.call(value) doesn't work on sandboxed natives
-    arrPlugin['[[Class]]']  = '[object Array]';
-    boolPlugin['[[Class]]'] = '[object Boolean]';
-    datePlugin['[[Class]]'] = '[object Date]';
-    funcPlugin['[[Class]]'] = '[object Function]';
-    numPlugin['[[Class]]']  = '[object Number]';
-    regPlugin['[[Class]]']  = '[object RegExp]';
-    strPlugin['[[Class]]']  = '[object String]';
 
 
     /*------------------------------- CLEANUP --------------------------------*/
