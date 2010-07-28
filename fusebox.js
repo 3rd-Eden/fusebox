@@ -89,6 +89,12 @@
       if (instance.Array().constructor === Array) {
         // move first iframe to trash
         errored = !!div.appendChild(cache.pop());
+
+        if (HAS_ACTIVEX) {
+          setMode(ACTIVEX_MODE);
+        } else if (HAS_PROTO) {
+          setMode(PROTO_MODE);
+        }
       }
       // Opera 9.5 - 10a throws a security error when calling Array#map or
       // String#lastIndexOf on sandboxed natives created on the file:// protocol.
