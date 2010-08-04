@@ -246,12 +246,7 @@
      __RegExp             = sandbox.RegExp,
      __String             = sandbox.String,
      __concat             = arrPlugin.concat = arrPlugin.concat,
-     __every              = arrPlugin.every = arrPlugin.every,
-     __filter             = arrPlugin.filter = arrPlugin.filter,
      __join               = arrPlugin.join = arrPlugin.join,
-     __indexOf            = arrPlugin.indexOf = arrPlugin.indexOf,
-     __lastIndexOf        = arrPlugin.lastIndexOf = arrPlugin.lastIndexOf,
-     __map                = arrPlugin.map = arrPlugin.map,
      __push               = arrPlugin.push = arrPlugin.push,
      __reverse            = arrPlugin.reverse = arrPlugin.reverse,
      __slice              = arrPlugin.slice = arrPlugin.slice,
@@ -299,11 +294,16 @@
      __toLocaleLowerCase  = strPlugin.toLocaleLowerCase = strPlugin.toLocaleLowerCase,
      __toLocaleUpperCase  = strPlugin.toLocaleUpperCase = strPlugin.toLocaleUpperCase,
      __toUpperCase        = strPlugin.toUpperCase = strPlugin.toUpperCase,
-     __trim               = strPlugin.trim = strPlugin.trim,
-     __trimLeft           = strPlugin.trimLeft = strPlugin.trimLeft,
-     __trimRight          = strPlugin.trimRight = strPlugin.trimRight,
-     __split              = strPlugin.split = ''.split,
-     __strLastIndexOf     = strPlugin.lastIndexOf = ''.lastIndexOf;
+     __split              = strPlugin.split = window.String().split,
+     __strLastIndexOf     = strPlugin.lastIndexOf = window.String().lastIndexOf,
+     __every              = arrPlugin.every,
+     __filter             = arrPlugin.filter,
+     __indexOf            = arrPlugin.indexOf,
+     __lastIndexOf        = arrPlugin.lastIndexOf,
+     __map                = IS_MAP_CORRUPT ? window.Array().map : arrPlugin.map,
+     __trim               = strPlugin.trim,
+     __trimLeft           = strPlugin.trimLeft,
+     __trimRight          = strPlugin.trimRight;
 
 
     // define as own methods of arrPlugin
@@ -601,7 +601,6 @@
           return __map.call(this, callback || IDENTITY, thisArg);
         };
       } else {
-        if (IS_MAP_CORRUPT) __map = [].map;
         arrPlugin.map = function map(callback, thisArg) {
           var result = __map.call(this, callback || IDENTITY, thisArg);
           return result.length ? Array.fromArray(result) : Array();
