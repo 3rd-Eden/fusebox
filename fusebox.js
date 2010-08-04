@@ -6,7 +6,7 @@
  *
  *--------------------------------------------------------------------------*/
 
-(function(global) {
+(function(window) {
 
   var CLEANED_ACTIVEX, IS_MAP_CORRUPT, MODE,
 
@@ -14,7 +14,7 @@
 
   counter = 1,
 
-  doc = global.document,
+  doc = window.document,
 
   uid = 'uid' + (new Date).getTime(),
 
@@ -23,7 +23,7 @@
   // typeof document.createElement -> object
   isHostType = function(object, property) {
     var type = typeof object[property];
-    return type === 'object' ? !!object[property] : !NON_HOST_TYPES[type];
+    return type == 'object' ? !!object[property] : !NON_HOST_TYPES[type];
   },
 
   ACTIVEX_MODE = 1,
@@ -46,18 +46,18 @@
   })(),
 
   HAS_IFRAME = doc && isHostType(doc, 'createElement') &&
-    isHostType(global, 'frames') && 'src' in doc.createElement('iframe'),
+    isHostType(window, 'frames') && 'src' in doc.createElement('iframe'),
 
   HAS_PROTO = (function() {
     // true for Gecko and Webkit
     var result = false, arr = [], obj = {}, backup = arr['__proto__'];
-    if (arr['__proto__'] === Array.prototype  &&
-        obj['__proto__'] === Object.prototype) {
+    if (arr['__proto__'] == Array.prototype  &&
+        obj['__proto__'] == Object.prototype) {
       // test if it's writable and restorable
       arr['__proto__'] = obj;
-      result = typeof arr.push === 'undefined';
+      result = typeof arr.push == 'undefined';
       arr['__proto__'] = backup;
-      return result && typeof arr.push === 'function';
+      return result && typeof arr.push == 'function';
     }
     return result;
   })(),
@@ -86,7 +86,7 @@
        toString = instance.Object().toString;
 
       // Safari does not support sandboxed natives from iframes :(
-      if (instance.Array().constructor === Array) {
+      if (instance.Array().constructor == Array) {
         // move first iframe to trash
         errored = !!div.appendChild(cache.pop());
 
@@ -102,7 +102,7 @@
       // Opera 9.5 - 9.64 will error by simply calling the methods.
       // Opera 10 will error when first accessing the contentDocument of
       // another iframe and then accessing the methods.
-      else if (toString.call(instance.Array().map) === '[object Function]') {
+      else if (toString.call(instance.Array().map) == '[object Function]') {
         // create and remove second iframe
         postProcessIframe(createSandbox());
   
@@ -128,14 +128,14 @@
 
   setMode = function(mode) {
     MODE = +mode;
-    postProcess = MODE === IFRAME_MODE ? postProcessIframe : IDENTITY;
+    postProcess = MODE == IFRAME_MODE ? postProcessIframe : IDENTITY;
   },
 
   createSandbox = function() {
     var iframe, key, name, parentNode, result, xdoc;
 
     switch (MODE) {
-      case PROTO_MODE: return global;
+      case PROTO_MODE: return window;
 
       case ACTIVEX_MODE:
         // IE requires the iframe/htmlfile remain in the cache or
@@ -149,8 +149,8 @@
         // IE doesn't support bfcache so we don't have to worry about breaking it.
         if (!CLEANED_ACTIVEX) {
           CLEANED_ACTIVEX = true;
-          if (isHostType(global, 'attachEvent')) {
-            global.attachEvent('onunload', function() { cache.length = 0; });
+          if (isHostType(window, 'attachEvent')) {
+            window.attachEvent('onunload', function() { cache.length = 0; });
           }
         }
         return xdoc.parentWindow;
@@ -172,9 +172,9 @@
           // A side effect is that Firefox will use the __proto__ technique
           // when served from the file:// protocol as well
           if ('MozOpacity' in doc.documentElement.style &&
-              isHostType(global, 'sessionStorage') &&
-              !global.sessionStorage[key]) {
-            global.sessionStorage[key] = 1;
+              isHostType(window, 'sessionStorage') &&
+              !window.sessionStorage[key]) {
+            window.sessionStorage[key] = 1;
             throw new Error;
           }
 
@@ -184,7 +184,7 @@
           iframe.style.display = 'none';
           parentNode.insertBefore(iframe, parentNode.firstChild);
 
-          result = global.frames[name];
+          result = window.frames[name];
           (xdoc = result.document).open();
           xdoc.write(
             // Firefox 3.5+ glitches when an iframe is inserted and removed,
@@ -223,10 +223,10 @@
     var Array, Boolean, Date, Function, Number, Object, RegExp, String, from, isFunction,
      sandbox              = createSandbox(),
      filterCallback       = function(value) { return value != null; },
-     glFunction           = global.Function,
-     isProtoMode          = MODE === PROTO_MODE,
-     isArrayChainable     = sandbox.Array().constructor !== global.Array,
-     isRegExpChainable    = sandbox.RegExp('').constructor !== global.RegExp,
+     glFunction           = window.Function,
+     isProtoMode          = MODE == PROTO_MODE,
+     isArrayChainable     = sandbox.Array().constructor !== window.Array,
+     isRegExpChainable    = sandbox.RegExp('').constructor !== window.RegExp,
      arrPlugin            = isProtoMode && new sandbox.Array    || sandbox.Array.prototype,
      boolPlugin           = isProtoMode && new sandbox.Boolean  || sandbox.Boolean.prototype,
      datePlugin           = isProtoMode && new sandbox.Date     || sandbox.Date.prototype,
@@ -314,26 +314,26 @@
     instance || (instance = new Klass);
 
     isFunction = function isFunction(value) {
-      return toString.call(value) === '[object Function]';
+      return toString.call(value) == '[object Function]';
     };
 
     from = function(value) {
       var classOf = toString.call(value);
       switch (classOf) {
         case '[object Array]':
-          if (value.constructor !== instance.Array) {
+          if (value.constructor != instance.Array) {
             return instance.Array.fromArray(value);
           }
           break;
 
         case '[object Boolean]':
-          if (value.constructor !== instance.Boolean) {
+          if (value.constructor != instance.Boolean) {
             return instance.Boolean(value == true);
           }
           break;
 
         case '[object RegExp]':
-          if (value.constructor !== instance.RegExp) {
+          if (value.constructor != instance.RegExp) {
             return instance.RegExp(value.source,
               (value.global     ? 'g' : '') +
               (value.ignoreCase ? 'i' : '') +
@@ -345,7 +345,7 @@
         case '[object Number]' :
         case '[object String]' :
           classOf = classOf.slice(8,-1);
-          if (value.constructor !== instance[classOf]) {
+          if (value.constructor != instance[classOf]) {
             return instance[classOf](value);
           }
       }
@@ -359,7 +359,7 @@
       Array = function Array(length) {
         var result = [], argLen = arguments.length;
         if (argLen) {
-          if (argLen === 1 && typeof length === 'number') {
+          if (argLen == 1 && typeof length == 'number') {
             result.length = length;
           } else {
             result.push.apply(result, arguments);
@@ -377,8 +377,8 @@
 
       Date = function Date(year, month, date, hours, minutes, seconds, ms) {
         var result;
-        if (this.constructor === Date) {
-          result = arguments.length === 1
+        if (this.constructor == Date) {
+          result = arguments.length == 1
             ? new __Date(year)
             : new __Date(year, month, date || 1, hours || 0, minutes || 0, seconds || 0, ms || 0);
           result['__proto__'] = datePlugin;
@@ -427,7 +427,7 @@
       Array = function Array(length) {
         var argLen = arguments.length;
         if (argLen) {
-          return argLen === 1 && typeof length === 'number'
+          return argLen == 1 && typeof length == 'number'
             ? new __Array(length)
             : Array.fromArray(arguments);
         }
@@ -439,8 +439,8 @@
       };
 
       Date = function Date(year, month, date, hours, minutes, seconds, ms) {
-        if (this.constructor === Date) {
-         return arguments.length === 1
+        if (this.constructor == Date) {
+         return arguments.length == 1
            ? new __Date(year)
            : new __Date(year, month, date || 1, hours || 0, minutes || 0, seconds || 0, ms || 0);
         }
@@ -457,15 +457,15 @@
           body = 'arguments.callee=arguments.callee.' + uid + ';' + body;
         }
 
-        // create function using global.Function constructor
+        // create function using window.Function constructor
         fn = new glFunction(args.join(','), body);
 
         // ensure `thisArg` isn't set to the sandboxed global
-        result = fn[uid] = new __Function('global, fn',
+        result = fn[uid] = new __Function('window, fn',
           'var sb=this;' +
           'return function(){' +
-          'return fn.apply(this==sb?global:this,arguments)' +
-          '}')(global, fn);
+          'return fn.apply(this==sb?window:this,arguments)' +
+          '}')(window, fn);
 
         // make toString() return the unmodified function body
         result.toString = toString;
@@ -504,11 +504,11 @@
 
     Number.MIN_VALUE         = 5e-324;
 
-    Number.NaN               = +'x';
+    Number.NaN               = NaN;
 
-    Number.NEGATIVE_INFINITY = __Number.NEGATIVE_INFINITY;
+    Number.NEGATIVE_INFINITY = -Infinity;
 
-    Number.POSITIVE_INFINITY = __Number.POSITIVE_INFINITY;
+    Number.POSITIVE_INFINITY = Infinity;
 
     Array.fromArray = function fromArray(array) {
       var result = new __Array;
@@ -540,7 +540,7 @@
     // ES5 15.4.3.2
     if (!isFunction(Array.isArray = __Array.isArray)) {
       Array.isArray = function isArray(value) {
-        return toString.call(value) === '[object Array]';
+        return toString.call(value) == '[object Array]';
       };
     }
 
@@ -941,8 +941,8 @@
   // content warnings in IE6. It is also used as a workaround for access denied errors
   // thrown when using iframes to create sandboxes after the document.domain is
   // set (Opera 9.25 is out of luck here).
-  if (HAS_ACTIVEX && !isHostType(global, 'XMLHttpRequest') &&
-        global.location && global.location.protocol === 'https:') {
+  if (HAS_ACTIVEX && !isHostType(window, 'XMLHttpRequest') &&
+        window.location && location.protocol == 'https:') {
     setMode(ACTIVEX_MODE);
   }
   // Iframes are the fastest and prefered technique
@@ -961,14 +961,14 @@
   if (doc && typeof doc.readyState !== 'string' && isHostType(doc, 'addEventListener')) {
     doc.readyState = 'loading';
     doc.addEventListener('DOMContentLoaded', function() { doc.readyState = 'interactive'; }, true);
-    global.addEventListener('load', function() { doc.readyState = 'complete'; }, true);
+    window.addEventListener('load', function() { doc.readyState = 'complete'; }, true);
   }
 
   // map Fusebox.prototype to Klass so Fusebox can be called without the `new` expression
   Klass.prototype = Fusebox.prototype;
 
   // expose
-  global.Fusebox  = Fusebox;
+  window.Fusebox  = Fusebox;
   Fusebox.getMode = getMode;
   Fusebox.setMode = setMode;
 })(this);
