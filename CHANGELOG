@@ -1,3 +1,5 @@
+* Reduce unnecessary code for sandboxes. [jddalton]
+
 * Fix regression with Firefox 1.5. [jddalton]
 
 * Remove [[Class]] fallback for the standalone Fusebox. [jddalton]

@@ -140,7 +140,7 @@
       case ACTIVEX_MODE:
         // IE requires the iframe/htmlfile remain in the cache or
         // it will become corrupted
-        (xdoc = new ActiveXObject('htmlfile')).open();
+        xdoc = new ActiveXObject('htmlfile');
         xdoc.write('<script><\/script>');
         xdoc.close();
         cache.push(xdoc);
@@ -150,13 +150,13 @@
         if (!CLEANED_ACTIVEX) {
           CLEANED_ACTIVEX = true;
           if (isHostType(window, 'attachEvent')) {
-            window.attachEvent('onunload', function() { cache.length = 0; });
+            attachEvent('onunload', function() { cache.length = 0 });
           }
         }
         return xdoc.parentWindow;
 
       case IFRAME_MODE:
-        key = '/* fusebox_iframe_cache_fix */';
+        key = '/* fuse_iframe_cache_fix */';
         name = uid + counter++;
         parentNode = doc.body || doc.documentElement;
 
@@ -173,8 +173,8 @@
           // when served from the file:// protocol as well
           if ('MozOpacity' in doc.documentElement.style &&
               isHostType(window, 'sessionStorage') &&
-              !window.sessionStorage[key]) {
-            window.sessionStorage[key] = 1;
+              !sessionStorage[key]) {
+            sessionStorage[key] = 1;
             throw new Error;
           }
 
@@ -185,7 +185,7 @@
           parentNode.insertBefore(iframe, parentNode.firstChild);
 
           result = window.frames[name];
-          (xdoc = result.document).open();
+          xdoc = result.document;
           xdoc.write(
             // Firefox 3.5+ glitches when an iframe is inserted and removed,
             // from a page containing other iframes, before dom load.
@@ -193,9 +193,9 @@
             // its content swapped with our iframe. Though the content is swapped,
             // the iframe will persist its `src` property so we check if our
             // iframe has a src property and load it if found.
-            '<script>var g=this,c=function(s){' +
-            '(s=g.frameElement.src)&&g.location.replace(s);' +
-            'if(g.parent.document.readyState!="complete"){g.setTimeout(c,10)}};' +
+            '<script>var c=function(s){' +
+            '(s=frameElement.src)&&location.replace(s);' +
+            'if(parent.document.readyState!="complete"){setTimeout(c,10)}};' +
             'c()<\/script>');
 
           xdoc.close();
@@ -222,7 +222,7 @@
     // the documented method.length value or allow null callbacks.
     var Array, Boolean, Date, Function, Number, Object, RegExp, String, from, isFunction,
      sandbox              = createSandbox(),
-     filterCallback       = function(value) { return value != null; },
+     filterCallback       = function(value) { return value != null },
      glFunction           = window.Function,
      isProtoMode          = MODE == PROTO_MODE,
      isArrayChainable     = sandbox.Array().constructor !== window.Array,
@@ -245,57 +245,57 @@
      __Object             = sandbox.Object,
      __RegExp             = sandbox.RegExp,
      __String             = sandbox.String,
-     __concat             = arrPlugin.concat = arrPlugin.concat,
-     __join               = arrPlugin.join = arrPlugin.join,
-     __push               = arrPlugin.push = arrPlugin.push,
-     __reverse            = arrPlugin.reverse = arrPlugin.reverse,
-     __slice              = arrPlugin.slice = arrPlugin.slice,
-     __splice             = arrPlugin.splice = arrPlugin.splice,
-     __some               = arrPlugin.some = arrPlugin.some,
-     __sort               = arrPlugin.sort = arrPlugin.sort,
-     __unshift            = arrPlugin.unshift = arrPlugin.unshift,
-     __getDate            = datePlugin.getDate = datePlugin.getDate,
-     __getDay             = datePlugin.getDay = datePlugin.getDay,
-     __getFullYear        = datePlugin.getFullYear = datePlugin.getFullYear,
-     __getHours           = datePlugin.getHours = datePlugin.getHours,
-     __getMilliseconds    = datePlugin.getMilliseconds = datePlugin.getMilliseconds,
-     __getMinutes         = datePlugin.getMinutes = datePlugin.getMinutes,
-     __getMonth           = datePlugin.getMonth = datePlugin.getMonth,
-     __getSeconds         = datePlugin.getSeconds = datePlugin.getSeconds,
-     __getTime            = datePlugin.getTime = datePlugin.getTime,
-     __getTimezoneOffset  = datePlugin.getTimezoneOffset = datePlugin.getTimezoneOffset,
-     __getUTCDate         = datePlugin.getUTCDate = datePlugin.getUTCDate,
-     __getUTCDay          = datePlugin.getUTCDay = datePlugin.getUTCDay,
-     __getUTCFullYear     = datePlugin.getUTCFullYear = datePlugin.getUTCFullYear,
-     __getUTCHours        = datePlugin.getUTCHours = datePlugin.getUTCHours,
-     __getUTCMilliseconds = datePlugin.getUTCMilliseconds = datePlugin.getUTCMilliseconds,
-     __getUTCMinutes      = datePlugin.getUTCMinutes = datePlugin.getUTCMinutes,
-     __getUTCMonth        = datePlugin.getUTCMonth = datePlugin.getUTCMonth,
-     __getUTCSeconds      = datePlugin.getUTCSeconds = datePlugin.getUTCSeconds,
-     __getYear            = datePlugin.getYear = datePlugin.getYear,
-     __toISOString        = datePlugin.toISOString = datePlugin.toISOString,
-     __toJSON             = datePlugin.toJSON = datePlugin.toJSON,
-     __toExponential      = numPlugin.toExponential = numPlugin.toExponential,
-     __toFixed            = numPlugin.toFixed = numPlugin.toFixed,
-     __toPrecision        = numPlugin.toPrecision = numPlugin.toPrecision,
-     __exec               = regPlugin.exec = regPlugin.exec,
-     __charAt             = strPlugin.charAt = strPlugin.charAt,
-     __charCodeAt         = strPlugin.charCodeAt = strPlugin.charCodeAt,
-     __strConcat          = strPlugin.concat = strPlugin.concat,
-     __strIndexOf         = strPlugin.indexOf = strPlugin.indexOf,
-     __localeCompare      = strPlugin.localeCompare = strPlugin.localeCompare,
-     __match              = strPlugin.match = strPlugin.match,
-     __replace            = strPlugin.replace = strPlugin.replace,
-     __search             = strPlugin.search = strPlugin.search,
-     __strSlice           = strPlugin.slice = strPlugin.slice,
-     __substr             = strPlugin.substr = strPlugin.substr,
-     __substring          = strPlugin.substring = strPlugin.substring,
-     __toLowerCase        = strPlugin.toLowerCase = strPlugin.toLowerCase,
-     __toLocaleLowerCase  = strPlugin.toLocaleLowerCase = strPlugin.toLocaleLowerCase,
-     __toLocaleUpperCase  = strPlugin.toLocaleUpperCase = strPlugin.toLocaleUpperCase,
-     __toUpperCase        = strPlugin.toUpperCase = strPlugin.toUpperCase,
-     __split              = strPlugin.split = window.String().split,
-     __strLastIndexOf     = strPlugin.lastIndexOf = window.String().lastIndexOf,
+     __concat             = arrPlugin.concat,
+     __join               = arrPlugin.join,
+     __push               = arrPlugin.push,
+     __reverse            = arrPlugin.reverse,
+     __slice              = arrPlugin.slice,
+     __splice             = arrPlugin.splice,
+     __some               = arrPlugin.some,
+     __sort               = arrPlugin.sort,
+     __unshift            = arrPlugin.unshift,
+     __getDate            = datePlugin.getDate,
+     __getDay             = datePlugin.getDay,
+     __getFullYear        = datePlugin.getFullYear,
+     __getHours           = datePlugin.getHours,
+     __getMilliseconds    = datePlugin.getMilliseconds,
+     __getMinutes         = datePlugin.getMinutes,
+     __getMonth           = datePlugin.getMonth,
+     __getSeconds         = datePlugin.getSeconds,
+     __getTime            = datePlugin.getTime,
+     __getTimezoneOffset  = datePlugin.getTimezoneOffset,
+     __getUTCDate         = datePlugin.getUTCDate,
+     __getUTCDay          = datePlugin.getUTCDay,
+     __getUTCFullYear     = datePlugin.getUTCFullYear,
+     __getUTCHours        = datePlugin.getUTCHours,
+     __getUTCMilliseconds = datePlugin.getUTCMilliseconds,
+     __getUTCMinutes      = datePlugin.getUTCMinutes,
+     __getUTCMonth        = datePlugin.getUTCMonth,
+     __getUTCSeconds      = datePlugin.getUTCSeconds,
+     __getYear            = datePlugin.getYear,
+     __toISOString        = datePlugin.toISOString,
+     __toJSON             = datePlugin.toJSON,
+     __toExponential      = numPlugin.toExponential,
+     __toFixed            = numPlugin.toFixed,
+     __toPrecision        = numPlugin.toPrecision,
+     __exec               = regPlugin.exec,
+     __charAt             = strPlugin.charAt,
+     __charCodeAt         = strPlugin.charCodeAt,
+     __strConcat          = strPlugin.concat,
+     __strIndexOf         = strPlugin.indexOf,
+     __localeCompare      = strPlugin.localeCompare,
+     __match              = strPlugin.match,
+     __replace            = strPlugin.replace,
+     __search             = strPlugin.search,
+     __strSlice           = strPlugin.slice,
+     __substr             = strPlugin.substr,
+     __substring          = strPlugin.substring,
+     __toLowerCase        = strPlugin.toLowerCase,
+     __toLocaleLowerCase  = strPlugin.toLocaleLowerCase,
+     __toLocaleUpperCase  = strPlugin.toLocaleUpperCase,
+     __toUpperCase        = strPlugin.toUpperCase,
+     __split              = window.String().split,
+     __strLastIndexOf     = window.String().lastIndexOf,
      __every              = arrPlugin.every,
      __filter             = arrPlugin.filter,
      __indexOf            = arrPlugin.indexOf,
@@ -304,12 +304,6 @@
      __trim               = strPlugin.trim,
      __trimLeft           = strPlugin.trimLeft,
      __trimRight          = strPlugin.trimRight;
-
-
-    // define as own methods of arrPlugin
-    arrPlugin.push  = arrPlugin.push;
-    arrPlugin.shift = arrPlugin.shift;
-    arrPlugin.sort  = arrPlugin.sort;
 
     instance || (instance = new Klass);
 
@@ -875,10 +869,14 @@
       return String(__toUpperCase.call(this));
     }).raw = __toUpperCase;
 
-    arrPlugin.concat.raw  = __concat;
-    arrPlugin.reverse.raw = __reverse;
-    arrPlugin.slice.raw   = __slice;
-    arrPlugin.splice.raw  = __splice;
+    // define as own methods of arrPlugin
+    arrPlugin.shift = arrPlugin.shift;
+    arrPlugin.sort  = arrPlugin.sort;
+
+    (arrPlugin.concat = arrPlugin.concat).raw = __concat;
+    (arrPlugin.reverse = arrPlugin.reverse).raw = __reverse;
+    (arrPlugin.slice = arrPlugin.slice).raw = __slice;
+    (arrPlugin.splice.raw = arrPlugin.splice).raw = __splice;
 
 
     /*-------------------------- MODIFY PROTOTYPES ---------------------------*/
@@ -961,7 +959,7 @@
   if (doc && typeof doc.readyState !== 'string' && isHostType(doc, 'addEventListener')) {
     doc.readyState = 'loading';
     doc.addEventListener('DOMContentLoaded', function() { doc.readyState = 'interactive'; }, true);
-    window.addEventListener('load', function() { doc.readyState = 'complete'; }, true);
+    addEventListener('load', function() { doc.readyState = 'complete'; }, true);
   }
 
   // map Fusebox.prototype to Klass so Fusebox can be called without the `new` expression
