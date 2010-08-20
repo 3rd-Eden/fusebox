@@ -1,3 +1,5 @@
+* Avoid adding a constructor property to the fuse.Object.prototype so objects created will work correctly in for-in loops. [jddalton]
+
 * Reduce unnecessary code for sandboxes. [jddalton]
 
 * Fix regression with Firefox 1.5. [jddalton]

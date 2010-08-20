@@ -895,7 +895,6 @@
     boolPlugin.constructor = Boolean;
     datePlugin.constructor = Date;
     funcPlugin.constructor = Function;
-    objPlugin.constructor  = Object;
     numPlugin.constructor  = Number;
     regPlugin.constructor  = RegExp;
     strPlugin.constructor  = String;
