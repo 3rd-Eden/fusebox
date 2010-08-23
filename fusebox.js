@@ -340,7 +340,7 @@
         case '[object String]' :
           classOf = classOf.slice(8,-1);
           if (value.constructor != instance[classOf]) {
-            return instance[classOf](value);
+            return new instance[classOf](value);
           }
       }
       return value;
@@ -617,7 +617,7 @@
 
     if (isFunction(datePlugin.toJSON)) {
       (datePlugin.toJSON = function toJSON() {
-        return instance.String(__toJSON.call(this));
+        return instance.String(__toJSON.call(new window.Date(this)));
       }).raw = __toJSON;
     }
 
